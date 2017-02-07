@@ -1,0 +1,45 @@
+{
+  "ProjectName": "Offline App",
+  "ProjectGuid": "99161e8d-c520-4d6f-9f80-d5f136c24fd5",
+  "projectVersion": 1,
+  "AppIdentifier": "com.telerik.OfflineApp",
+  "DisplayName": "Offline App",
+  "Author": "",
+  "Description": "Offline App",
+  "BundleVersion": "1.0",
+  "AndroidVersionCode": "1",
+  "iOSDeviceFamily": [
+    "1",
+    "2"
+  ],
+  "iOSBackgroundMode": [],
+  "ProjectTypeGuids": "{070BCB52-5A75-4F8C-A973-144AF0EAFCC9}",
+  "FrameworkVersion": "4.0.0",
+  "AndroidPermissions": [
+    "android.permission.INTERNET"
+  ],
+  "DeviceOrientations": [
+    "Portrait",
+    "Landscape"
+  ],
+  "AndroidHardwareAcceleration": "true",
+  "iOSStatusBarStyle": "Default",
+  "Framework": "Cordova",
+  "WP8TileTitle": "",
+  "WP8Publisher": "",
+  "WP8Capabilities": [
+    "ID_CAP_NETWORKING",
+    "ID_CAP_WEBBROWSERCOMPONENT"
+  ],
+  "WP8Requirements": [],
+  "WP8PublisherID": "{f26b244d-24aa-4e40-b445-706e41ce04ce}",
+  "WP8ProductID": "{9ed707c9-ae65-4278-a5b5-0326691759ef}",
+  "WPSdk": "8.0",
+  "WP8PackageIdentityName": "1234Telerik.OfflineApp",
+  "WP8WindowsPublisherName": "CN=Telerik",
+  "WP8SupportedResolutions": [
+    "ID_RESOLUTION_WVGA",
+    "ID_RESOLUTION_WXGA",
+    "ID_RESOLUTION_HD720P"
+  ]
+}

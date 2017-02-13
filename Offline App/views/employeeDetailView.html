@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    <div id="menu"
+        data-role="view"
+        data-show="app.viewModels.employeeViewModel.onShowDetail"
+        data-model="app.viewModels.employeeViewModel"
+        data-title="Detail">
+
+        <div data-role="header">
+            <div data-role="navbar">
+                <a data-role="button" data-align="left" data-icon="details" data-bind="click: onCancel" class="km-back"></a>
+                <span data-role="view-title"></span>
+                <!-- <span data-bind="text: currentItem.FullName"></span> -->
+                <a data-role="button" data-align="right" data-icon="compose" data-bind="click: onEdit, invisible: isEdit"></a>
+                <a data-role="button" data-align="right" data-icon="save" data-bind="click: onSave, visible: isEdit"></a>
+            </div>
+        </div>
+
+        <div id="employee-details">
+            <div class="item-img">
+                <img data-bind="attr: {src: currentItem.ImageURI}" data-offline data-responsive/>
+            </div>
+            <div class="item">
+                <span class="item-label">First Name</span>
+                <input type="text" id="first-name" data-bind="value: currentItem.FirstName, enabled: isEdit" />
+            </div>
+
+            <div class="item">
+                <span class="item-label">Last Name</span>
+                <input type="text" id="last-name" data-bind="value: currentItem.LastName, enabled: isEdit" />
+            </div>
+
+            <div class="item">
+                <span class="item-label">Address</span>
+                <input type="text" id="address" data-bind="value: currentItem.Address, enabled: isEdit" />
+            </div>
+            
+            <div class="item">
+                <span class="item-label">City</span>
+                <input type="text" id="city" data-bind="value: currentItem.City, enabled: isEdit" />
+            </div>
+
+            <div class="item">
+                <span class="item-label">State</span>
+                <input type="text" id="city" data-bind="value: currentItem.State, enabled: isEdit" />
+            </div>
+
+            <div class="item">
+                <span class="item-label">Phone</span>
+                <input type="text" id="city" data-bind="value: currentItem.HomePhone, enabled: isEdit" />
+            </div>
+        </div>
+    </div>
+</body>
+</html>

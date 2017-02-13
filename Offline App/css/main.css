@@ -1,0 +1,192 @@
+.km-header {
+    font-size: 0;
+}
+
+.km-view-title {
+    font-size: 20px;
+}
+
+.km-header .km-button {
+    font-size: 14px;
+}
+
+.km-navbar .km-button {
+    background-color: initial;
+    border-style: none;
+}
+
+.km-back {
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+}
+
+#app-footer {
+    z-index: 1000;
+    background-color: #000;
+    color: white;
+    text-align: center;
+    padding: .5em;
+}
+
+#online-footer strong {
+    color: #008000;
+}
+
+#offline-footer strong {
+    color: #ff0000;
+}
+
+#online-footer, #offline-footer, #sync-footer, #sync-done-footer {
+    display: none;
+}
+
+#app-footer.online #online-footer {
+    display: block;
+}
+
+#app-footer.offline #offline-footer {
+    display: block;
+}
+
+#app-footer.sync #sync-footer {
+    display: block;
+}
+
+#app-footer.sync-done #sync-done-footer {
+    display: block;
+}
+
+.km-content .km-button {
+    text-align: center;
+    font-size: 1em;
+    color: #fff;
+    background-color: #3277d5;
+    border-width: 0;
+    border-radius: 0;
+}
+
+.km-content .km-button.km-state-active {
+    background-color: #2568c2;
+}
+
+.km-content .km-button small {
+    display: block;
+    margin-top: .35em;
+}
+
+.km-content .km-button.button-caution {
+    background-color: #df1962;
+}
+
+.km-content .km-button.button-caution.km-state-active {
+    background-color: #c80f53;
+}
+
+.km-content .km-button.button-submit {
+    background-color: #10c4b2;
+}
+
+.km-content .km-button.button-submit.km-state-active {
+    background-color: #0EB1A2;
+}
+
+.button-block {
+    display: block;
+}
+
+.button-group {
+    display: table;
+    width: 100%;
+    border-spacing: 1em;
+    border-collapse: separate;
+}
+
+.menu .km-button {
+    padding: 1em .5em;
+    margin: 1em;
+}
+
+.km-flat .km-touch-scrollbar {
+    background-color: gray;
+}
+
+#employee-list li {
+    padding: 10px;
+    text-decoration: none;
+}
+
+#employee-list .image {
+    float: left;
+    width: 5em;
+    height: 5em;
+    overflow: hidden;
+    margin-right: 10px;
+    border: 1px solid #e2e2e2;
+}
+
+#employee-list .image img {
+    width: 5em;
+}
+
+#employee-list .title, #employee-list .address, #employee-list .phone {
+    display: block;
+    font-size: 1em;
+    margin-bottom: 0.2em;
+}
+
+#employee-list .title {
+    font-size: 1.25em;
+    font-weight: bold;
+    margin-bottom: 0.4em;
+}
+
+#employee-details {
+    padding: 1.25em 1em 1em;
+    background-color: #fff;
+}
+
+#employee-details .item, #employee-details .item-img {
+    margin: 0 0 1.25em;
+}
+
+#employee-details .item-label {
+    display: block;
+    margin: 0 0 .35em;
+    padding: 0 0 .35em;
+    border-bottom: 1px solid #e2e2e2;
+    color: #878787;
+    font-size: 0.8em;
+}
+
+#employee-details .item-img {
+    display: block;
+    width: 10em;
+    height: 10em;
+    overflow: hidden;
+    border: 1px solid #e2e2e2;
+}
+
+#employee-details .item-img img {
+    width: 10em;
+}
+
+#employee-details input {
+    display: block;
+    color: #4c5356;
+    width: 100%;
+    border: 0;
+    padding: 0;
+    outline: 0;
+    background: 0 0;
+    font-size: 1.25em;
+}
+
+#employee-details input:disabled {
+    color: #4c5356;
+    opacity: 1;
+    background: none;
+}
+
+.km-save:after {
+    content: '\e0bd';
+}

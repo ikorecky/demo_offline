@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    <div id="menu"
+        data-role="view"
+        data-init="app.viewModels.menuViewModel.onInit"
+        data-show="app.viewModels.menuViewModel.onShow"
+        data-model="app.viewModels.menuViewModel"
+        data-title="Menu">
+
+        <div data-role="header">
+            <div data-role="navbar">
+                <a data-role="button" data-align="left" data-icon="details" data-bind="click: logout, enabled: isOnline" class="km-back"></a>
+                <span data-bind="text: welcome"></span>
+            </div>
+        </div> 
+
+        <div class="button-group menu" align="center">
+            <a data-role="button" class="button-block" href="views/employeeListView.html">Employees</a>
+            <a data-role="button" class="button-block button-caution" data-bind="click: logout, enabled: isOnline">Log out</a>
+        </div>
+    </div>
+</body>
+</html>

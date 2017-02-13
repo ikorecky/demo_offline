@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    <div id="menu"
+        data-role="view"
+        data-init="app.viewModels.employeeViewModel.onInitList"
+        data-show="app.viewModels.employeeViewModel.onShowList"
+        data-model="app.viewModels.employeeViewModel"
+        data-title="Employees">
+
+        <ul id="employee-list"></ul>
+        <!--
+        <ul id="employee-list"
+            data-role="listview"
+            data-bind="{ source: jsdo.dataSource }"
+            data-template="employee-list-template">
+        </ul>
+        <script type="text/x-kendo-template" id="employee-list-template">
+            <img src="img/#: imgURI #" />
+            <big><strong>#: LastName #, #: FirstName #</strong></big><br />
+            #: Address #, #: City #, #: State #<br />
+            #: HomePhone #
+        </script>
+        -->
+    </div>
+</body>
+</html>

@@ -56,7 +56,7 @@
             that.set("isLoginDisabled", isLoginDisabled);
 
             if (isLoginDisabled) {
-                navigator.notification.alert("First login must be online.");
+                navigator.notification.alert("New login must be online.");
             }
         }
     });

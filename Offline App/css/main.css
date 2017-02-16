@@ -36,7 +36,7 @@
     color: #ff0000;
 }
 
-#online-footer, #offline-footer, #sync-footer, #sync-done-footer {
+#online-footer, #offline-footer, #sync-footer, #sync-done-footer, #sync-fail-footer {
     display: none;
 }
 
@@ -53,6 +53,10 @@
 }
 
 #app-footer.sync-done #sync-done-footer {
+    display: block;
+}
+
+#app-footer.sync-fail #sync-fail-footer {
     display: block;
 }
 

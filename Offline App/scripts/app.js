@@ -1,7 +1,4 @@
 (function ($) {
-    // device.isVirtual does not exist in this version of the cordova device plugin
-    var isSim = false;
-
     var App = kendo.Observable.extend({
         init: function () {
             var that = this;
@@ -91,6 +88,11 @@
             that._disconnect(callback);
         },
 
+        // device.isVirtual does not exist in this version of the cordova device plugin
+        isVirtual: function() {
+            return (navigator.appVersion.toLowerCase().indexOf("windows") >= 0);
+        },
+
         isConnected: function () {
             var that = this;
 
@@ -98,7 +100,9 @@
         },
 
         isOnline: function () {
-            if (isSim) {
+            var that = this;
+
+            if (that.isVirtual()) {
                 return true;
             }
             else if (!navigator || !navigator.connection) {
@@ -240,7 +244,7 @@
             var that = this,
                 jsdoSession = new progress.data.JSDOSession(jsdoSettings);
 
-            if (that.isOnline() && !isSim) {
+            if (that.isOnline() && !that.isVirtual()) {
                 var ft = new FileTransfer(),
                     catalogURIs = jsdoSettings.catalogURIs,
                     abortTimeout = setTimeout(function () {
@@ -279,7 +283,7 @@
             callback = callback || function () { };
 
             var that = this,
-                fileURL = (!isSim ? cordova.file.dataDirectory + "/JSDOCatalog.json" : jsdoSettings.catalogURIs);
+                fileURL = (!that.isVirtual() ? cordova.file.dataDirectory + "/JSDOCatalog.json" : jsdoSettings.catalogURIs);
 
             that.jsdoSession.addCatalog(fileURL)
                 .done(callback)

@@ -39,31 +39,26 @@
             that.password = password;
 
             if (!that.jsdoSession) {
-                that._createSession(doLogin);
+                that.jsdoSession = new progress.data.JSDOSession(jsdoSettings);
+            }
+
+            if (that.isOnline()) {
+                that._connect(function () {
+                    callback();
+
+                    localStorage.setItem("username", that.username);
+                    localStorage.setItem("password", that._hashCode(that.password).toString());
+                });
             }
             else {
-                doLogin();
-            }
+                username = localStorage.getItem("username") || "";
+                password = localStorage.getItem("password") || "";
 
-            function doLogin() {
-                if (that.isOnline()) {
-                    that._connect(function () {
-                        callback();
-
-                        localStorage.setItem("username", that.username);
-                        localStorage.setItem("password", that._hashCode(that.password).toString());
-                    });
+                if (username !== that.username || password !== that._hashCode(that.password).toString()) {
+                    navigator.notification.alert("Invalid username or password");
                 }
                 else {
-                    username = localStorage.getItem("username") || "";
-                    password = localStorage.getItem("password") || "";
-
-                    if (username !== that.username || password !== that._hashCode(that.password).toString()) {
-                        navigator.notification.alert("Invalid username or password");
-                    }
-                    else {
-                        that._addCatalog(callback);
-                    }
+                    that._addCatalog(callback);
                 }
             }
         },
@@ -89,7 +84,7 @@
         },
 
         // device.isVirtual does not exist in this version of the cordova device plugin
-        isVirtual: function() {
+        isVirtual: function () {
             return (navigator.appVersion.toLowerCase().indexOf("windows") >= 0);
         },
 
@@ -194,17 +189,18 @@
                 return;
             }
 
-            if (that._isLoggedIn) {
-                that._disconnect(doConnect);
-            }
-            else {
-                doConnect();
-            }
+            that._downloadCatalog(function () {
+                if (that._isLoggedIn) {
+                    that._disconnect(doConnect);
+                }
+                else {
+                    doConnect();
+                }
+            });
 
             var cnt = 0;
 
             function doConnect() {
-                cnt++;
                 that.jsdoSession.login(that.username, that.password)
                     .done(function () {
                         that._isLoggedIn = true;
@@ -215,14 +211,7 @@
                         });
                     })
                     .fail(function () {
-                        setTimeout(function () {
-                            if (cnt < 3) {
-                                doConnect();
-                            }
-                            else {
-                                navigator.notification.alert("jsdoSession.login() failed");
-                            }
-                        }, 500);
+                        navigator.notification.alert("jsdoSession.login() failed");
                     });
             }
         },
@@ -238,19 +227,21 @@
             });
         },
 
-        _createSession: function (callback) {
+        _downloadCatalog: function (callback) {
             callback = callback || function () { };
 
-            var that = this,
-                jsdoSession = new progress.data.JSDOSession(jsdoSettings);
+            var that = this;
 
-            if (that.isOnline() && !that.isVirtual()) {
+            if (that.isVirtual()) {
+                callback();
+            }
+            else {
                 var ft = new FileTransfer(),
                     catalogURIs = jsdoSettings.catalogURIs,
                     abortTimeout = setTimeout(function () {
                         ft.abort();
                         navigator.notification.alert("File download timed out for " + catalogURIs);
-                    }, 3000);
+                    }, 5000);
 
                 ft.download(
                     encodeURI(catalogURIs),
@@ -258,7 +249,7 @@
                     function () {
                         clearTimeout(abortTimeout);
 
-                        doSuccess();
+                        callback();
                     },
 
                     function (error) {
@@ -267,15 +258,6 @@
 
                     true
                 );
-            }
-
-            else {
-                doSuccess();
-            }
-
-            function doSuccess() {
-                that.jsdoSession = jsdoSession;
-                callback();
             }
         },
 
@@ -321,14 +303,9 @@
 
             else {
                 if (isOnline) {
-                    // the _connect will both display footer trigger
-                    that._ping(jsdoSettings.serviceURI, function (success) {
-                        if (success) {
-                            that._connect(function () {
-                                that._syncChanges();
-                            });
-                        }
-                    }, 3000);
+                    that._connect(function () {
+                        that._syncChanges();
+                    });
                 }
                 else {
                     that._displayFooter("offline");
@@ -362,41 +339,6 @@
                 else {
                     return that.isConnected();
                 }
-            }
-        },
-
-        _ping(addr, callback, timeout) {
-            if (timeout === undefined) {
-                timeout = 1500;
-            }
-
-            var that = this;
-            
-            that._pingBusy = true;
-
-            var img = new Image();
-            img.onerror = img.onload = function () {
-                doDone(true);
-            };
-
-            try {
-                img.src = addr;
-            }
-            catch (e) {
-            }
-
-            var timeout = setTimeout(function () {
-                timout = null;
-                doDone(false);
-            }, timeout);
-
-            function doDone(result) {
-                if (timeout) {
-                    clearTimeout(timeout);
-                    timeout = null;
-                }
-                that._pingBusy = false;
-                callback(result);
             }
         },
 

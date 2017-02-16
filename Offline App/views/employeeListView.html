@@ -11,20 +11,18 @@
         data-model="app.viewModels.employeeViewModel"
         data-title="Employees">
 
-        <ul id="employee-list"></ul>
-        <!--
         <ul id="employee-list"
             data-role="listview"
-            data-bind="{ source: jsdo.dataSource }"
+            data-bind="source: dataSource, click: onClickListItem"
             data-template="employee-list-template">
         </ul>
         <script type="text/x-kendo-template" id="employee-list-template">
-            <img src="img/#: imgURI #" />
-            <big><strong>#: LastName #, #: FirstName #</strong></big><br />
-            #: Address #, #: City #, #: State #<br />
-            #: HomePhone #
+            <span class="image"><img src="#: ImageURI() #" /></span>
+            <span class="title">#: FullName() #</span>
+            <span class="address">#: Address #, #: City #, #: State #</span>
+            <span class="phone">#: HomePhone #</span>
         </script>
-        -->
+
     </div>
 </body>
 </html>

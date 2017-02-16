@@ -8,6 +8,11 @@
         onInit: function (e) {
             var that = this;
 
+            // currently the only way to know the mobile app dom manipulations are complete
+            that.one("show", function () {
+                app.onShow();
+            });
+
             app.bind("online", function () {
                 that.model._enableUI()
             });

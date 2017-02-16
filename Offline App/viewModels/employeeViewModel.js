@@ -6,38 +6,22 @@
         onInitList: function () {
             var that = this;
 
-            that.model.jsdo = new OfflineJSDO({
+            var dataSource = new OfflineJSDODataSource({
                 name: "Employee",
-                dataSource: {
-                    schema: {
-                        model: {
-                            FullName: function () {
-                                return this.LastName + ', ' + this.FirstName;
-                            },
+                schema: {
+                    model: {
+                        FullName: function () {
+                            return this.LastName + ', ' + this.FirstName;
+                        },
 
-                            ImageURI: function () {
-                                return "img/" + (this.EmpNum <= 10 ? this.EmpNum : "unknown") + ".jpg";
-                            }
+                        ImageURI: function () {
+                            return "img/" + (this.EmpNum <= 10 ? this.EmpNum : "unknown") + ".jpg";
                         }
                     }
                 }
             });
 
-            $("#employee-list").kendoMobileListView({
-                dataSource: that.model.jsdo.dataSource,
-                template: "<span class=\"image\"><img src=\"#: ImageURI() #\" /></span>"
-                + "<span class=\"title\">#: FullName() #</span>"
-                + "<span class=\"address\">#: Address #, #: City #, #: State #</span>"
-                + "<span class=\"phone\">#: HomePhone #</span>",
-
-                click: that.model.onClickListItem
-            });
-        },
-
-        onShowList: function () {
-            var that = this;
-
-            // that.model.jsdo.dataSource.read();
+            that.model.set("dataSource", dataSource);
         },
 
         onClickListItem: function (e) {
@@ -46,7 +30,7 @@
 
         onShowDetail: function (e) {
             var that = this,
-                item = that.model.jsdo.dataSource.getByUid(e.view.params.uid);
+                item = that.model.dataSource.getByUid(e.view.params.uid);
 
             that.model.set("currentItem", item);
             that.model.set("isEdit", false);
@@ -61,15 +45,15 @@
         onSave: function () {
             var that = this;
 
-            that.jsdo.dataSource.sync();
+            that.dataSource.sync();
             app.mobileApp.navigate("#:back");
         },
 
         onCancel: function () {
             var that = this;
 
-            if (that.jsdo.dataSource.hasChanges()) {
-                that.jsdo.dataSource.cancelChanges();
+            if (that.dataSource.hasChanges()) {
+                that.dataSource.cancelChanges();
             }
             app.mobileApp.navigate("#:back");
         }

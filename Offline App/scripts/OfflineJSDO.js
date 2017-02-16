@@ -29,9 +29,13 @@
             batch: true,
             transport: {
                 read: function (e) {
-                    that.offlineFill().done(function (jsdo) {
-                        e.success(jsdo.getData());
-                    });
+                    that.offlineFill()
+                        .done(function (jsdo) {
+                            e.success(jsdo.getData());
+                        })
+                        .fail(function () {
+                            e.error("dataSource.read() failed");
+                        });
                 },
 
                 update: function (e) {
@@ -39,9 +43,14 @@
                         var rec = that.findById(data._id);
                         rec.assign(data);
                     });
-                    that.offlineSaveChanges().done(function () {
-                        e.success();
-                    });
+
+                    that.offlineSaveChanges()
+                        .done(function () {
+                            e.success();
+                        })
+                        .fail(function () {
+                            e.error("dataSource.update() failed");
+                        })
                 },
 
                 create: function (e) {
@@ -68,10 +77,21 @@
         offlineFill: function (e) {
             var that = this, deferred = $.Deferred();
 
-            if (app.jsdoSession.connected) {
+            if (app.isConnected()) {
+                jsdo.readLocal(jsdo.name)
+                    .done(function () {
+                        if (jsdo.hasChanges()) {
+                            jsdo.saveChanges().done(doFill);
+                        }
+                        else {
+                            doFill();
+                        }
+                    })
+                    .error(doFill);
+                    
                 that.readLocal(that.name);
                 if (that.hasChanges()) {
-                    that.offlineSaveChanges().done(doFill());
+                    that.offlineSaveChanges().done(doFill);
                 }
                 else {
                     doFill();

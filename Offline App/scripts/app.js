@@ -189,6 +189,7 @@
                 return;
             }
 
+            // also used to verify connection to the server with a controlled timeout
             that._downloadCatalog(function () {
                 if (that._isLoggedIn) {
                     that._disconnect(doConnect);

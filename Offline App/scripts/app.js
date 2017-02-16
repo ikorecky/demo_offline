@@ -26,7 +26,6 @@
         onShow: function () {
             var that = this;
 
-            console.log(device.model);
             that._addOnlineOfflineListeners();
 
             if (navigator && navigator.splashscreen) {
@@ -191,7 +190,7 @@
                 return;
             }
 
-            if (that.isConnected()) {
+            if (that._isLoggedIn) {
                 that._disconnect(doConnect);
             }
             else {
@@ -204,7 +203,12 @@
                 cnt++;
                 that.jsdoSession.login(that.username, that.password)
                     .done(function () {
-                        that._addCatalog(callback);
+                        that._isLoggedIn = true;
+                        that._addCatalog(function () {
+                            that._displayFooter("online");
+                            that.trigger("online");
+                            callback()
+                        });
                     })
                     .fail(function () {
                         setTimeout(function () {
@@ -225,6 +229,7 @@
             var that = this;
 
             that.jsdoSession.logout().always(function () {
+                that._isLoggedIn = false;
                 callback();
             });
         },
@@ -266,7 +271,6 @@
 
             function doSuccess() {
                 that.jsdoSession = jsdoSession;
-                that._addConnectionListeners();
                 callback();
             }
         },
@@ -282,32 +286,6 @@
                 .fail(function (jsdoSession, result, details) {
                     navigator.notification.alert("jsdoSession.addCatalog() failed");
                 });
-        },
-
-        _addConnectionListeners: function () {
-            var that = this, isConnected = that.isConnected();
-
-            that._wasConnected = isConnected;
-
-            that.jsdoSession.subscribe('online', function () {
-                that._onConnectionChange();
-            });
-            that.jsdoSession.subscribe('offline', function () {
-                that._onConnectionChange();
-            });
-        },
-
-        _onConnectionChange: function () {
-            var that = this, isConnected = that.isConnected();
-
-            if (that._wasConnected === isConnected) {
-                return;
-            }
-            that._wasConnected = isConnected;
-
-            if (isConnected) {
-                that._syncChanges();
-            }
         },
 
         _addOnlineOfflineListeners: function () {
@@ -333,10 +311,25 @@
             }
             that._wasOnline = isOnline;
 
-            this._displayFooter();
+            if (that._username === null) {
+                this._displayFooter();
+            }
 
-            if (isOnline) {
-                that._connect();
+            else {
+                if (isOnline) {
+                    // the _connect will both display footer trigger
+                    that._ping(jsdoSettings.serviceURI, function (success) {
+                        if (success) {
+                            that._connect(function () {
+                                that._syncChanges();
+                            });
+                        }
+                    }, 3000);
+                }
+                else {
+                    that._displayFooter("offline");
+                    that.trigger("offline");
+                }
             }
         },
 
@@ -365,6 +358,41 @@
                 else {
                     return that.isConnected();
                 }
+            }
+        },
+
+        _ping(addr, callback, timeout) {
+            if (timeout === undefined) {
+                timeout = 1500;
+            }
+
+            var that = this;
+            
+            that._pingBusy = true;
+
+            var img = new Image();
+            img.onerror = img.onload = function () {
+                doDone(true);
+            };
+
+            try {
+                img.src = addr;
+            }
+            catch (e) {
+            }
+
+            var timeout = setTimeout(function () {
+                timout = null;
+                doDone(false);
+            }, timeout);
+
+            function doDone(result) {
+                if (timeout) {
+                    clearTimeout(timeout);
+                    timeout = null;
+                }
+                that._pingBusy = false;
+                callback(result);
             }
         },
 

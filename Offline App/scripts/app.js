@@ -315,7 +315,7 @@
             }
             that._wasOnline = isOnline;
 
-            if (that._username === null) {
+            if (that.username === null) {
                 this._displayFooter();
             }
 

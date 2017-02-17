@@ -13,11 +13,11 @@
                 app.onShow();
             });
 
-            app.bind("online", function () {
+            document.addEventListener("online", function () {
                 that.model._enableUI()
             });
 
-            app.bind("offline", function () {
+            document.addEventListener("offline", function () {
                 that.model._enableUI()
             });
         },

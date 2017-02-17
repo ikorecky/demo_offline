@@ -31,42 +31,45 @@
         },
 
         login: function (username, password, callback) {
-            callback = callback || function () { };
-
             var that = this;
 
-            that.username = username;
-            that.password = password;
+            callback = callback || function () { };
 
             if (!that.jsdoSession) {
                 that.jsdoSession = new progress.data.JSDOSession(jsdoSettings);
             }
 
             if (that.isOnline()) {
-                that._connect(function () {
-                    callback();
+                that._connect(username, password, function () {
+                    doSuccess();
 
-                    localStorage.setItem("username", that.username);
-                    localStorage.setItem("password", that._hashCode(that.password).toString());
+                    callback();
                 });
             }
             else {
-                username = localStorage.getItem("username") || "";
-                password = localStorage.getItem("password") || "";
-
-                if (username !== that.username || password !== that._hashCode(that.password).toString()) {
+                if ((localStorage.getItem("username") || "") !== username
+                || (localStorage.getItem("password") || "") !== that._hashCode(password).toString()) {
                     navigator.notification.alert("Invalid username or password");
                 }
                 else {
+                    doSuccess();
+
                     that._addCatalog(callback);
                 }
+            }
+            function doSuccess() {
+                that.username = username;
+                that.password = password;
+
+                localStorage.setItem("username", that.username);
+                localStorage.setItem("password", that._hashCode(that.password).toString());
             }
         },
 
         logout: function (callback) {
-            callback = callback || function () { };
-
             var that = this;
+
+            callback = callback || function () { };
 
             if (!that.isOnline()) {
                 navigator.notification.alert("Cannot logout offline");
@@ -179,10 +182,17 @@
             }, 500);
         },
 
-        _connect: function (callback) {
-            callback = callback || function () { };
-
+        _connect: function (username, password, callback) {
             var that = this;
+
+            // re-connect
+            if (arguments.length === 1) {
+                callback = username;
+                username = that.username;
+                password = that.password;
+            }
+
+            callback = callback || function () { };
 
             if (!that.isOnline()) {
                 navigator.notification.alert("Network not connected. Cannot login.");
@@ -198,8 +208,6 @@
                     doConnect();
                 }
             });
-
-            var cnt = 0;
 
             function doConnect() {
                 that.jsdoSession.login(that.username, that.password)
@@ -218,9 +226,9 @@
         },
 
         _disconnect: function (callback) {
-            callback = callback || function () { };
-
             var that = this;
+
+            callback = callback || function () { };
 
             that.jsdoSession.logout().always(function () {
                 that._isLoggedIn = false;
@@ -229,9 +237,9 @@
         },
 
         _downloadCatalog: function (callback) {
-            callback = callback || function () { };
-
             var that = this;
+
+            callback = callback || function () { };
 
             if (that.isVirtual()) {
                 callback();
@@ -263,10 +271,10 @@
         },
 
         _addCatalog: function (callback) {
-            callback = callback || function () { };
-
             var that = this,
                 fileURL = (!that.isVirtual() ? cordova.file.dataDirectory + "/JSDOCatalog.json" : jsdoSettings.catalogURIs);
+
+            callback = callback || function () { };
 
             that.jsdoSession.addCatalog(fileURL)
                 .done(callback)

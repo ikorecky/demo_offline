@@ -3,6 +3,12 @@
         isOnline: false,
         welcome: "",
 
+        onLogin: function () {
+            app.dataSources.employeeDataSource = new EmployeeDataSource();
+
+            app.loadDataSources();
+        },
+
         onInit: function (e) {
             var that = this;
 
@@ -15,11 +21,15 @@
             });
         },
 
-        onShow: function() {
+        onShow: function (e) {
             var that = this;
 
             that.model.set("isOnline", app.isOnline());
             that.model.set("welcome", "Welcome " + app.username);
+
+            if (e.view.params.ref === "login") {
+                that.model.onLogin();
+            }
         },
 
         logout: function () {

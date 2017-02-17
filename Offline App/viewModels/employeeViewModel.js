@@ -1,27 +1,9 @@
 (function ($) {
     app.viewModels.employeeViewModel = new kendo.data.ObservableObject({
-        currentItem: null,
-        isEdit: false,
-
         onInitList: function () {
             var that = this;
 
-            var dataSource = new OfflineJSDODataSource({
-                name: "Employee",
-                schema: {
-                    model: {
-                        FullName: function () {
-                            return this.LastName + ', ' + this.FirstName;
-                        },
-
-                        ImageURI: function () {
-                            return "img/" + (this.EmpNum <= 10 ? this.EmpNum : "unknown") + ".jpg";
-                        }
-                    }
-                }
-            });
-
-            that.model.set("dataSource", dataSource);
+            that.model.set("dataSource", app.dataSources.employeeDataSource);
         },
 
         onClickListItem: function (e) {

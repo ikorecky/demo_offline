@@ -33,7 +33,7 @@
             var that = this;
 
             app.login(that.get("username"), that.get("password"), function () {
-                app.mobileApp.navigate("views/menuView.html");
+                app.mobileApp.navigate("views/menuView.html?ref=login");
             });
         },
 
@@ -57,7 +57,7 @@
             that.set("isLoginDisabled", isLoginDisabled);
 
             if (isLoginDisabled) {
-                navigator.notification.alert("New login must be online.");
+                navigator.notification.alert("First login must be online.");
             }
         }
     });

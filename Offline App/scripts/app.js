@@ -16,6 +16,7 @@
             }, false);
 
             that.viewModels = {};
+            that.dataSources = {};
             that.username = null;
             that.password = null;
         },
@@ -79,10 +80,6 @@
             that.username = null;
             that.password = null;
 
-            localStorage.removeItem("username");
-            localStorage.removeItem("password");
-
-            that._deleteLocal();
             that._disconnect(callback);
         },
 
@@ -111,7 +108,55 @@
             }
         },
 
-        _syncChanges: function () {
+        hasChanges: function () {
+            var that = this, JSDOs = that.jsdoSession.JSDOs;
+
+            for (var i = 0; i < JSDOs.length; i++) {
+                if (JSDOs[i].hasChanges()) {
+                    return true;
+                }
+            }
+
+            return false;
+        },
+
+        loadDataSources: function () {
+            var that = this,
+                arr = that.jsdoSession.JSDOs.slice(),
+                ok = that.isConnected() && that.hasChanges();
+
+            if (arr.length === 0) {
+                return;
+            }
+
+            if (ok) {
+                that._onSync();
+            }
+            doFill();
+
+            function doFill() {
+                var jsdo = arr.shift();
+
+                jsdo.dataSource.read()
+                    .done(function () {
+                        if (arr.length === 0) {
+                            if (ok) {
+                                app._onSyncDone();
+                            }
+                        }
+                        else {
+                            doFill();
+                        }
+                    })
+                    .fail(function () {
+                        if (ok) {
+                            app._onSyncFail();
+                        }
+                    });
+            }
+        },
+
+        saveChanges: function () {
             var that = this, arr = [];
 
             $.each(that.jsdoSession.JSDOs, function (idx, jsdo) {
@@ -130,9 +175,8 @@
             function doSync() {
                 var jsdo = arr.shift();
 
-                jsdo.saveChanges()
-                    .done(function (jsdo, success, request) {
-                        jsdo.saveLocal(jsdo.name);
+                jsdo.offlineSaveChanges()
+                    .done(function () {
                         if (arr.length === 0) {
                             app._onSyncDone();
                         }
@@ -140,18 +184,10 @@
                             doSync();
                         }
                     })
-                    .fail(function (jsdo, success, request) {
+                    .fail(function () {
                         app._onSyncFail();
                     });
             }
-        },
-
-        _deleteLocal: function () {
-            var that = this;
-
-            $.each(that.jsdoSession.JSDOs, function (idx, jsdo) {
-                jsdo.deleteLocal();
-            })
         },
 
         _onSync: function () {
@@ -259,7 +295,7 @@
                         clearTimeout(abortTimeout);
 
                         moveFile(
-                            cordova.file.tempDirectory, "JSDOCatalog.json", 
+                            cordova.file.tempDirectory, "JSDOCatalog.json",
                             cordova.file.dataDirectory, "JSDOCatalog.json",
                             callback);
                     },
@@ -337,7 +373,7 @@
             else {
                 if (isOnline) {
                     that._connect(function () {
-                        that._syncChanges();
+                        that.saveChanges();
                     });
                 }
                 else {

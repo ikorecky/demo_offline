@@ -1,11 +1,16 @@
 (function () {
     OfflineJSDODataSource = kendo.data.DataSource.extend({
         init: function (opts) {
+            var that = this;
+
             opts = opts || {};
+            opts = $.extend(true, that.options, {batch: true}, opts);
 
-            var that = this, idField;
+            var name = opts.name,
+                idField = null,
+                jsdo = that._createJSDO(name);
 
-            $.each(progress.data.ServicesManager.getResource(opts.name).schema.properties, function (name, ds) {
+            $.each(progress.data.ServicesManager.getResource(name).schema.properties, function (name, ds) {
                 $.each(ds.properties, function (name, tt) {
                     idField = tt.primaryKey[0];
                     return false;
@@ -13,22 +18,43 @@
                 return false;
             });
 
-            var jsdo = new progress.data.JSDO({
-                name: opts.name,
-                autoFill: false
-            });
-
-            delete opts.name;
-
             opts = $.extend(true, {
                 batch: true,
                 transport: {
                     read: function (opts) {
-                        that.offlineRead(opts);
+                        return that.jsdo.offlineFill()
+                            .done(function (jsdo) {
+                                opts.success(jsdo.getData());
+                            })
+                            .fail(function () {
+                                opts.error("jsdo.fill() failed");
+                            })
                     },
 
                     update: function (opts) {
-                        that.offlineUpdate(opts);
+                        $.each(opts.data.models, function (idx, data) {
+                            var rec = that.jsdo.findById(data._id);
+                            rec.assign(data);
+                        });
+
+                        var isConnected = app.isConnected();
+                        if (isConnected) {
+                            app._onSync();
+                        }
+
+                        return that.jsdo.offlineSaveChanges()
+                            .done(function () {
+                                if (isConnected) {
+                                    app._onSyncDone();
+                                }
+                                opts.success();
+                            })
+                            .fail(function () {
+                                if (isConnected) {
+                                    app._onSyncFail();
+                                }
+                                opts.error("jsdo.saveChanges() failed");
+                            });
                     },
 
                     create: function (opts) {
@@ -49,63 +75,72 @@
             kendo.data.DataSource.fn.init.call(that, opts);
 
             that.jsdo = jsdo;
+            jsdo.dataSource = that;
         },
 
-        offlineRead: function (opts) {
-            var that = this, jsdo = that.jsdo;
+        _createJSDO: function (name) {
+            var that = this,
+                jsdo = new progress.data.JSDO({
+                    name: name,
+                    autoFill: false
+                });
 
-            if (app.isConnected()) {
-                jsdo.readLocal(jsdo.name);
-                if (jsdo.hasChanges()) {
-                    jsdo.saveChanges().done(doFill);
+            jsdo.localStorageName = app.username + "-" + jsdo.name;
+
+            jsdo.offlineFill = function (opts) {
+                var that = this, deferred = $.Deferred();
+
+                if (app.isConnected()) {
+                    that.readLocal(that.localStorageName);
+                    if (that.hasChanges()) {
+                        that.offlineSaveChanges().done(doFill);
+                    }
+                    else {
+                        doFill();
+                    }
                 }
                 else {
-                    doFill();
+                    that.readLocal(that.localStorageName);
+                    deferred.resolve(that, true, null);
                 }
-            }
-            else {
-                jsdo.readLocal(jsdo.name);
-                opts.success(jsdo.getData());
-            }
 
-            function doFill() {
-                jsdo.fill()
-                    .done(function (jsdo, success, request) {
-                        jsdo.saveLocal(jsdo.name);
-                        opts.success(jsdo.getData());
-                    })
-                    .fail(function () {
-                        opts.error("jsdo.fill() failed");
-                    });
-            }
-        },
+                return deferred.promise();
 
-        offlineUpdate: function (opts) {
-            var that = this, jsdo = that.jsdo;
+                function doFill() {
+                    that.fill(opts)
+                        .done(function (jsdo, success, request) {
+                            that.saveLocal(that.localStorageName);
+                            deferred.resolve(jsdo, success, request);
+                        })
+                        .fail(function (jsdo, success, request) {
+                            deferred.reject(jsdo, success, request);
+                        });
+                }
+            };
 
-            $.each(opts.data.models, function (idx, data) {
-                var rec = jsdo.findById(data._id);
-                rec.assign(data);
-            });
+            jsdo.offlineSaveChanges = function (submit) {
+                var that = this, deferred = $.Deferred();
 
-            if (app.isConnected()) {
-                app._onSync();
+                that.saveLocal(that.localStorageName);
 
-                jsdo.saveChanges()
-                    .done(function (jsdo, success, request) {
-                        jsdo.saveLocal(jsdo.name);
-                        app._onSyncDone();
-                        opts.success();
-                    })
-                    .fail(function (jsdo, success, request) {
-                        app._onSyncFail();
-                        opts.error("jsdo.saveChanges() failed");
-                    });
-            }
-            else {
-                jsdo.saveLocal(jsdo.name);
-                opts.success();
-            }
+                if (app.isConnected()) {
+                    that.saveChanges()
+                        .done(function (jsdo, success, request) {
+                            that.saveLocal(that.localStorageName);
+                            deferred.resolve(jsdo, success, request);
+                        })
+                        .fail(function (jsdo, success, request) {
+                            deferred.reject(jsdo, success, request);
+                        });
+                }
+                else {
+                    deferred.resolve(that, true, null);
+                }
+
+                return deferred.promise();
+            };
+
+            return jsdo;
         }
     });
 })();

@@ -4,7 +4,7 @@
             var that = this;
 
             opts = opts || {};
-            opts = $.extend(true, that.options, {batch: true}, opts);
+            opts = $.extend(true, that.options, { batch: true }, opts);
 
             var name = opts.name,
                 idField = null,
@@ -37,22 +37,11 @@
                             rec.assign(data);
                         });
 
-                        var isConnected = app.isConnected();
-                        if (isConnected) {
-                            app._onSync();
-                        }
-
                         return that.jsdo.offlineSaveChanges()
                             .done(function () {
-                                if (isConnected) {
-                                    app._onSyncDone();
-                                }
                                 opts.success();
                             })
                             .fail(function () {
-                                if (isConnected) {
-                                    app._onSyncFail();
-                                }
                                 opts.error("jsdo.saveChanges() failed");
                             });
                     },
@@ -93,7 +82,11 @@
                 if (app.isConnected()) {
                     that.readLocal(that.localStorageName);
                     if (that.hasChanges()) {
-                        that.offlineSaveChanges().done(doFill);
+                        that.offlineSaveChanges()
+                            .done(doFill)
+                            .fail(function() {
+                                deferred.reject(that, false, null)
+                            });
                     }
                     else {
                         doFill();
@@ -124,13 +117,17 @@
                 that.saveLocal(that.localStorageName);
 
                 if (app.isConnected()) {
+                    app.onSync();
+
                     that.saveChanges()
                         .done(function (jsdo, success, request) {
                             that.saveLocal(that.localStorageName);
                             deferred.resolve(jsdo, success, request);
+                            app.onSyncDone();
                         })
                         .fail(function (jsdo, success, request) {
                             deferred.reject(jsdo, success, request);
+                            app.onSyncFail();
                         });
                 }
                 else {

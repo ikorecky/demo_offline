@@ -122,16 +122,12 @@
 
         loadDataSources: function () {
             var that = this,
-                arr = that.jsdoSession.JSDOs.slice(),
-                ok = that.isConnected() && that.hasChanges();
+                arr = that.jsdoSession.JSDOs.slice();
 
             if (arr.length === 0) {
                 return;
             }
 
-            if (ok) {
-                that._onSync();
-            }
             doFill();
 
             function doFill() {
@@ -139,18 +135,8 @@
 
                 jsdo.dataSource.read()
                     .done(function () {
-                        if (arr.length === 0) {
-                            if (ok) {
-                                app._onSyncDone();
-                            }
-                        }
-                        else {
+                        if (arr.length > 0) {
                             doFill();
-                        }
-                    })
-                    .fail(function () {
-                        if (ok) {
-                            app._onSyncFail();
                         }
                     });
             }
@@ -169,7 +155,6 @@
                 return;
             }
 
-            that._onSync();
             doSync();
 
             function doSync() {
@@ -177,42 +162,55 @@
 
                 jsdo.offlineSaveChanges()
                     .done(function () {
-                        if (arr.length === 0) {
-                            app._onSyncDone();
-                        }
-                        else {
+                        if (arr.length > 0) {
                             doSync();
                         }
-                    })
-                    .fail(function () {
-                        app._onSyncFail();
                     });
             }
         },
 
-        _onSync: function () {
+        onSync: function () {
             var that = this;
+
+            if (that._syncTimeout) {
+                clearTimeout(that._syncTimeout);
+                that._syncTimeout = null;
+            }
 
             that._displayFooter("sync");
         },
 
-        _onSyncDone: function () {
+        onSyncDone: function () {
             var that = this;
 
-            setTimeout(function () {
+            if (that._syncTimeout) {
+                clearTimeout(that._syncTimeout);
+                that._syncTimeout = null;
+            }
+
+            that._syncTimeout = setTimeout(function () {
+                that._syncTimeout = null;
                 that._displayFooter("sync-done");
-                setTimeout(function () {
+                that._syncTimeout = setTimeout(function () {
+                    that._syncTimeout = null;
                     that._displayFooter();
                 }, 1000);
             }, 500);
         },
 
-        _onSyncFail: function () {
+        onSyncFail: function () {
             var that = this;
 
-            setTimeout(function () {
-                that._displayFooter("sync-fail");
-                setTimeout(function () {
+            if (that._syncTimeout) {
+                clearTimeout(that._syncTimeout);
+                that._syncTimeout = null;
+            }
+
+            that._syncTimeout = setTimeout(function () {
+                that._syncTimeout = null;
+                that._displayFooter("sync-done");
+                that._syncTimeout = setTimeout(function () {
+                    that._syncTimeout = null;
                     that._displayFooter();
                 }, 1000);
             }, 500);
@@ -279,29 +277,47 @@
 
             if (that.isVirtual()) {
                 callback();
+                return;
             }
-            else {
+
+            var cnt = 0;
+
+            downloadFile(
+                jsdoSettings.catalogURIs,
+                cordova.file.tempDirectory + "/JSDOCatalog.json",
+                function () {
+                    moveFile(
+                        cordova.file.tempDirectory, "JSDOCatalog.json",
+                        cordova.file.dataDirectory, "JSDOCatalog.json",
+                        callback);
+                }
+            );
+
+            function downloadFile(sourcefile, targetfile, callback) {
                 var ft = new FileTransfer(),
-                    catalogURIs = jsdoSettings.catalogURIs,
                     abortTimeout = setTimeout(function () {
                         ft.abort();
-                        navigator.notification.alert("File download timed out for " + catalogURIs);
-                    }, 5000);
+                        fail();
+                    }, 3000);
 
                 ft.download(
-                    encodeURI(catalogURIs),
-                    cordova.file.tempDirectory + "/JSDOCatalog.json",
+                    encodeURI(sourcefile),
+                    targetfile,
                     function () {
                         clearTimeout(abortTimeout);
-
-                        moveFile(
-                            cordova.file.tempDirectory, "JSDOCatalog.json",
-                            cordova.file.dataDirectory, "JSDOCatalog.json",
-                            callback);
+                        callback();
                     },
 
                     function (error) {
-                        navigator.notification.alert("FileTransfer.download failed for " + catalogURIs);
+                        clearTimeout(abortTimeout);
+
+                        cnt++;
+                        if (cnt < 3) {
+                            downloadFile(sourcefile, targetfile, callback);
+                        }
+                        else {
+                            navigator.notification.alert("Download timedout for " + sourcefile);
+                        }
                     },
 
                     true

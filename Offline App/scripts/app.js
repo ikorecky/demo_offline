@@ -48,7 +48,7 @@
             }
             else {
                 if ((localStorage.getItem("username") || "") !== username
-                || (localStorage.getItem("password") || "") !== that._hashCode(password).toString()) {
+                    || (localStorage.getItem("password") || "") !== that._hashCode(password).toString()) {
                     navigator.notification.alert("Invalid username or password");
                 }
                 else {
@@ -254,11 +254,14 @@
 
                 ft.download(
                     encodeURI(catalogURIs),
-                    cordova.file.dataDirectory + "/JSDOCatalog.json",
+                    cordova.file.tempDirectory + "/JSDOCatalog.json",
                     function () {
                         clearTimeout(abortTimeout);
 
-                        callback();
+                        moveFile(
+                            cordova.file.tempDirectory, "JSDOCatalog.json", 
+                            cordova.file.dataDirectory, "JSDOCatalog.json",
+                            callback);
                     },
 
                     function (error) {
@@ -267,6 +270,27 @@
 
                     true
                 );
+            }
+
+            function moveFile(olddir, oldname, newdir, newname, callback) {
+                window.resolveLocalFileSystemURL(
+                    olddir + "/" + oldname,
+                    function (fileEntry) {
+                        window.resolveLocalFileSystemURL(newdir,
+                            function (dirEntry) {
+                                fileEntry.moveTo(dirEntry, newname,
+                                    callback,
+                                    function () {
+                                        navigator.notification.alert("fileEntry.moveTo() failed");
+                                    });
+                            },
+                            function () {
+                                navigator.notification.alert("resolveLocalFileSystemURL() failed for " + newdir);
+                            });
+                    },
+                    function () {
+                        navigator.notification.alert("resolveLocalFileSystemURL() failed for " + olddir + "/" + oldname);
+                    });
             }
         },
 

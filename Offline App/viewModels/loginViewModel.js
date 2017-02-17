@@ -13,13 +13,14 @@
                 app.onShow();
             });
 
-            document.addEventListener("online", function () {
-                that.model._enableUI()
-            });
+            document.addEventListener("online", doRefresh);
+            document.addEventListener("offline", doRefresh);
 
-            document.addEventListener("offline", function () {
-                that.model._enableUI()
-            });
+            function doRefresh() {
+                if (app.mobileApp.view() === that) {
+                    that.model._enableUI()
+                }
+            }
         },
 
         onShow: function (e) {

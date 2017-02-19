@@ -14,6 +14,7 @@
             <div data-role="navbar">
                 <a data-role="button" data-align="left" data-icon="details" data-bind="click: onCancel" class="km-back"></a>
                 <span data-bind="text: currentItem.FullName"></span>
+                <a data-role="button" data-align="right" data-icon="delete" data-bind="click: onDelete, invisible: isEdit"></a>
                 <a data-role="button" data-align="right" data-icon="compose" data-bind="click: onEdit, invisible: isEdit"></a>
                 <a data-role="button" data-align="right" data-icon="save" data-bind="click: onSave, visible: isEdit"></a>
             </div>

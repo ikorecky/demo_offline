@@ -32,30 +32,23 @@
     color: #008000;
 }
 
-#offline-footer strong {
-    color: #ff0000;
+#offline-footer strong,
+#connect-fail-footer strong,
+#sync-fail-footer strong {
+    color: #f00;
 }
 
-#online-footer, #offline-footer, #sync-footer, #sync-done-footer, #sync-fail-footer {
+#connect, #connect-done, #connect-fail, #online-footer, #offline-footer, #sync-footer, #sync-done-footer, #sync-fail-footer {
     display: none;
 }
 
-#app-footer.online #online-footer {
-    display: block;
-}
-
-#app-footer.offline #offline-footer {
-    display: block;
-}
-
-#app-footer.sync #sync-footer {
-    display: block;
-}
-
-#app-footer.sync-done #sync-done-footer {
-    display: block;
-}
-
+#app-footer.connect #connect,
+#app-footer.connect-done #connect-done,
+#app-footer.connect-fail #connect-fail,
+#app-footer.online #online-footer,
+#app-footer.offline #offline-footer,
+#app-footer.sync #sync-footer,
+#app-footer.sync-done #sync-done-footer,
 #app-footer.sync-fail #sync-fail-footer {
     display: block;
 }

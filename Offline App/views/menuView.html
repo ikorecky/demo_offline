@@ -14,14 +14,14 @@
 
         <div data-role="header">
             <div data-role="navbar">
-                <a data-role="button" data-align="left" data-icon="details" data-bind="click: logout, enabled: isOnline" class="km-back"></a>
+                <a data-role="button" data-align="left" data-icon="details" data-bind="click: onLogout, enabled: isOnline" class="km-back"></a>
                 <span data-bind="text: welcome"></span>
             </div>
         </div> 
 
         <div class="button-group menu" align="center">
             <a data-role="button" class="button-block" href="views/employeeListView.html">Employees</a>
-            <a data-role="button" class="button-block button-caution" data-bind="click: logout, enabled: isOnline">Log out</a>
+            <a data-role="button" class="button-block button-caution" data-bind="click: onLogout, enabled: isOnline">Log out</a>
         </div>
     </div>
 </body>

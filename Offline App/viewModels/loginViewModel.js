@@ -1,10 +1,5 @@
 (function ($) {
     app.viewModels.loginViewModel = new kendo.data.ObservableObject({
-        username: "",
-        password: "",
-        isOnline: false,
-        isLoginDisabled: false,
-
         onInit: function (e) {
             var that = this;
 
@@ -32,17 +27,22 @@
         login: function (e) {
             var that = this;
 
-            app.login(that.get("username"), that.get("password"), function () {
-                app.mobileApp.navigate("views/menuView.html?ref=login");
-            });
+            that.set("disableLogin", true);
+
+            app.login(that.get("username"), that.get("password"))
+                .done(function () {
+                    app.mobileApp.navigate("views/menuView.html?ref=login");
+                })
+                .fail(function () {
+                    that.set("disableLogin", false);
+                })
         },
 
         _enableUI: function () {
             var that = this,
                 username = localStorage.getItem("username") || "",
                 password = localStorage.getItem("password") || "",
-                isOnline = app.isOnline(),
-                isLoginDisabled = (!isOnline && password === "");
+                isOnline = app.isOnline();
 
             if (isOnline) {
                 that.set("username", "");
@@ -54,11 +54,7 @@
             }
 
             that.set("isOnline", isOnline);
-            that.set("isLoginDisabled", isLoginDisabled);
-
-            if (isLoginDisabled) {
-                navigator.notification.alert("First login must be online.");
-            }
+            that.set("disableLogin", false);
         }
     });
 })(jQuery);

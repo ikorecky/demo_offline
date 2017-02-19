@@ -1,24 +1,21 @@
 (function ($) {
     app.viewModels.menuViewModel = new kendo.data.ObservableObject({
-        isOnline: false,
-        welcome: "",
-
         onLogin: function () {
+            // create and load all data sources after login
+            // so any pending changes will be synchronized after login
             app.dataSources.employeeDataSource = new EmployeeDataSource();
-
             app.loadDataSources();
         },
 
         onInit: function (e) {
             var that = this;
 
-            app.bind("online", function () {
-                that.model.set("isOnline", app.isOnline());
-            });
+            app.bind("online", onOnlineOffline);
+            app.bind("offline", onOnlineOffline);
 
-            app.bind("offline", function () {
+            function onOnlineOffline() {
                 that.model.set("isOnline", app.isOnline());
-            });
+            }
         },
 
         onShow: function (e) {
@@ -32,8 +29,8 @@
             }
         },
 
-        logout: function () {
-            app.logout(function () {
+        onLogout: function () {
+            app.logout().done(function () {
                 app.mobileApp.navigate("views/loginView.html");
             });
         }

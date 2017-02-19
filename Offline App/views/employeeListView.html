@@ -10,16 +10,24 @@
         data-model="app.viewModels.employeeViewModel"
         data-title="Employees">
 
+        <div data-role="header">
+            <div data-role="navbar">
+                <a data-role="backbutton" data-align="left" data-icon="details"></a>
+                <span data-role="view-title"></span>
+                <a data-role="button" data-align="right" data-icon="add" data-bind="click: onCreate"></a>
+            </div>
+        </div>
+
         <ul id="employee-list"
             data-role="listview"
             data-bind="source: dataSource, click: onClickListItem"
             data-template="employee-list-template">
         </ul>
         <script type="text/x-kendo-template" id="employee-list-template">
-            <span class="image"><img src="#: ImageURI() #" /></span>
-            <span class="title">#: FullName() #</span>
-            <span class="address">#: Address #, #: City #, #: State #</span>
-            <span class="phone">#: HomePhone #</span>
+            <span class="image"><img src="#: data.ImageURI() #" /></span>
+            <span class="title">#: data.FullName() #</span>
+            <span class="address">#: data.Address #, #: data.City #, #: data.State #</span>
+            <span class="phone">#: data.HomePhone #</span>
         </script>
 
     </div>

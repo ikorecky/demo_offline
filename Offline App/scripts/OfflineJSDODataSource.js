@@ -26,15 +26,11 @@
 
                         that.jsdo.offlineFill()
                             .done(function (jsdo, success, request) {
-                                opts.success(jsdo.getData());
+                                opts.success();
                                 deferred.resolve();
                             })
                             .fail(function (jsdo, success, request) {
-                                displayErrors();
-                                that.jsdo.offlineDeleteLocal();
-                                that.data([]);
-
-                                opts.error(jsdo.getData());
+                                opts.error();
                                 deferred.reject();
                             })
 
@@ -42,29 +38,65 @@
                     },
 
                     update: function (opts) {
+                        var deferred = $.Deferred();
+
                         $.each(opts.data.models, function (idx, data) {
                             var rec = that.jsdo.findById(data._id);
                             rec.assign(data);
                         });
 
-                        return saveChanges(opts);
+                        that.jsdo.offlineSaveChanges()
+                            .done(function (jsdo, success, request) {
+                                opts.success();
+                                deferred.resolve();
+                            })
+                            .fail(function (jsdo, success, request) {
+                                opts.error();
+                                deferred.reject();
+                            });
+
+                        return deferred;
                     },
 
                     create: function (opts) {
+                        var deferred = $.Deferred();
+
                         $.each(opts.data.models, function (idx, data) {
                             that.jsdo.add(data);
                         });
 
-                        return saveChanges(opts);
+                        that.jsdo.offlineSaveChanges()
+                            .done(function (jsdo, success, request) {
+                                opts.success();
+                                deferred.resolve();
+                            })
+                            .fail(function (jsdo, success, request) {
+                                opts.error();
+                                deferred.reject();
+                            });
+
+                        return deferred;
                     },
 
                     destroy: function (opts) {
+                        var deferred = $.Deferred();
+
                         $.each(opts.data.models, function (idx, data) {
                             var rec = that.jsdo.findById(data._id);
                             rec.remove();
                         });
 
-                        return saveChanges(opts);
+                        that.jsdo.offlineSaveChanges()
+                            .done(function (jsdo, success, request) {
+                                opts.success();
+                                deferred.resolve();
+                            })
+                            .fail(function (jsdo, success, request) {
+                                opts.error();
+                                deferred.reject();
+                            });
+
+                        return deferred;
                     }
                 },
 
@@ -79,38 +111,6 @@
 
             that.jsdo = jsdo;
             jsdo.dataSource = that;
-
-            function saveChanges(opts) {
-                var deferred = $.Deferred();
-
-                that.jsdo.offlineSaveChanges()
-                    .done(function (jsdo, success, request) {
-                        if (request) {
-                            jsdo.dataSource.data(jsdo.getData());
-                        }
-                        opts.success();
-                        deferred.resolve();
-                    })
-                    .fail(function (jsdo, success, request) {
-                        displayErrors();
-                        that.cancelChanges();
-                        that.jsdo.offlineRejectChanges();
-                        opts.error();
-                        deferred.reject();
-                    });
-
-                return deferred;
-            }
-
-            function displayErrors() {
-                var msg = "";
-
-                $.each(that.jsdo.getErrors(), function (idx, error) {
-                    msg = (msg !== "" ? "<br/>" : "") + error.error;
-                });
-
-                navigator.notification.alert(msg);
-            }
         },
 
         _createJSDO: function (name) {
@@ -147,9 +147,14 @@
                     that.fill(opts)
                         .done(function (jsdo, success, request) {
                             that.saveLocal(that.name);
+                            that.dataSource.data(jsdo.getData());
                             deferred.resolve(jsdo, success, request);
                         })
                         .fail(function (jsdo, success, request) {
+                            that.displayErrors();
+                            that.offlineDeleteLocal();
+                            that.dataSource.data([]);
+
                             deferred.reject(jsdo, success, request);
                         });
                 }
@@ -167,10 +172,18 @@
                         .done(function (jsdo, success, request) {
                             app.onSyncDone();
                             that.saveLocal(that.name);
+                            that.dataSource.data(that.getData());
+
                             deferred.resolve(jsdo, success, request);
                         })
                         .fail(function (jsdo, success, request) {
+                            that.displayErrors();
                             app.onSyncFail();
+
+                            that.offlineRejectChanges();
+                            that.dataSource.data(that.getData());
+                            that.saveLocal(that.name);
+
                             deferred.reject(jsdo, success, request);
                         });
                 }
@@ -192,6 +205,16 @@
                 var that = this;
 
                 that.deleteLocal(that.name);
+            };
+
+            jsdo.displayErrors = function () {
+                var that = this, msg = "";
+
+                $.each(that.getErrors(), function (idx, error) {
+                    msg += (msg !== "" ? ". " : "") + error.error;
+                });
+
+                navigator.notification.alert(msg);
             };
 
             return jsdo;

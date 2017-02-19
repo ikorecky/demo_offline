@@ -85,7 +85,9 @@
 
                 that.jsdo.offlineSaveChanges()
                     .done(function (jsdo, success, request) {
-                        jsdo.dataSource.data(jsdo.getData());
+                        if (request) {
+                            jsdo.dataSource.data(jsdo.getData());
+                        }
                         opts.success();
                         deferred.resolve();
                     })

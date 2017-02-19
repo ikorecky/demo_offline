@@ -14,6 +14,7 @@
             var that = this,
                 item = that.model.dataSource.getByUid(e.view.params.uid);
 
+            that.model.set("currentItem", null); // force calculated fields to refresh
             that.model.set("currentItem", item);
             that.model.set("isEdit", (e.view.params.isEdit === "true" ? true : false));
         },

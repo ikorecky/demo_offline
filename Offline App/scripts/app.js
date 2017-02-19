@@ -156,7 +156,7 @@
             function doFill() {
                 var jsdo = arr.shift();
 
-                jsdo.dataSource.read()
+                jsdo.offlineFill()
                     .always(function () {
                         if (arr.length > 0) {
                             doFill();

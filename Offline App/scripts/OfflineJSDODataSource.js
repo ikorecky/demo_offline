@@ -26,7 +26,7 @@
 
                         that.jsdo.offlineFill()
                             .done(function (jsdo, success, request) {
-                                opts.success();
+                                opts.success(jsdo.getData());
                                 deferred.resolve();
                             })
                             .fail(function (jsdo, success, request) {

@@ -30,6 +30,7 @@
                                 deferred.resolve();
                             })
                             .fail(function (jsdo, success, request) {
+                                that.data([]);
                                 opts.error();
                                 deferred.reject();
                             })
@@ -113,6 +114,41 @@
             jsdo.dataSource = that;
         },
 
+        sync: function() {
+            var that = this, deferred = $.Deferred();
+
+            if (that.hasChanges()) {
+                kendo.data.DataSource.fn.sync.call(that)
+                    .done(function () {
+                        deferred.resolve();
+                        if (app.isConnected()) {
+                            that.data(that.jsdo.getData());
+                        }
+                    })
+                    .fail(function () {
+                        deferred.reject();
+                        that.data(that.jsdo.getData());
+                    });
+            }
+
+            else
+            if (that.jsdo.hasChanges()) {
+                that.jsdo.offlineSaveChanges()
+                    .done(function () {
+                        deferred.resolve();
+                        if (app.isConnected()) {
+                            that.data(that.jsdo.getData());
+                        }
+                    })
+                    .fail(function () {
+                        deferred.reject();
+                        that.data(that.jsdo.getData());
+                    });
+            }
+
+            return deferred;
+        },
+
         _createJSDO: function (name) {
             var that = this,
                 jsdo = new progress.data.JSDO({
@@ -147,14 +183,11 @@
                     that.fill(opts)
                         .done(function (jsdo, success, request) {
                             that.saveLocal(that.name);
-                            that.dataSource.data(jsdo.getData());
                             deferred.resolve(jsdo, success, request);
                         })
                         .fail(function (jsdo, success, request) {
                             that.displayErrors();
                             that.offlineDeleteLocal();
-                            that.dataSource.data([]);
-
                             deferred.reject(jsdo, success, request);
                         });
                 }
@@ -172,7 +205,6 @@
                         .done(function (jsdo, success, request) {
                             app.onSyncDone();
                             that.saveLocal(that.name);
-                            that.dataSource.data(that.getData());
 
                             deferred.resolve(jsdo, success, request);
                         })
@@ -181,7 +213,6 @@
                             app.onSyncFail();
 
                             that.offlineRejectChanges();
-                            that.dataSource.data(that.getData());
                             that.saveLocal(that.name);
 
                             deferred.reject(jsdo, success, request);

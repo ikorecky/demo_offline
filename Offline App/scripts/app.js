@@ -156,7 +156,7 @@
             function doFill() {
                 var jsdo = arr.shift();
 
-                jsdo.offlineFill()
+                jsdo.dataSource.read()
                     .always(function () {
                         if (arr.length > 0) {
                             doFill();
@@ -183,7 +183,7 @@
             function doSync() {
                 var jsdo = arr.shift();
 
-                jsdo.offlineSaveChanges()
+                jsdo.dataSource.sync()
                     .done(function () {
                         if (arr.length > 0) {
                             doSync();
@@ -331,9 +331,14 @@
                             });
                     },
                     function (error) {
+                        // only timeout is used because fail can happen quicker 
+                        // and we would like to spaceout the retries
+
+                        /*
                         if (!abortTimeout) {
                             return;
                         }
+
                         clearTimeout(abortTimeout);
                         abortTimeout = null;
 
@@ -345,6 +350,7 @@
                             navigator.notification.alert("Download failed for " + jsdoSettings.catalogURIs);
                             deferred.reject();
                         }
+                        */
                     },
 
                     true

@@ -24,7 +24,7 @@
             that.model._enableUI();
         },
 
-        login: function (e) {
+        onLogin: function (e) {
             var that = this;
 
             that.set("disableLogin", true);

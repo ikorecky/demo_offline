@@ -24,7 +24,7 @@
                     read: function (opts) {
                         var deferred = $.Deferred();
 
-                        that.jsdo.offlineFill()
+                        that.jsdo._offlineFill()
                             .done(function (jsdo, success, request) {
                                 opts.success(jsdo.getData());
                                 deferred.resolve();
@@ -46,7 +46,7 @@
                             rec.assign(data);
                         });
 
-                        that.jsdo.offlineSaveChanges()
+                        that.jsdo._offlineSaveChanges()
                             .done(function (jsdo, success, request) {
                                 opts.success();
                                 deferred.resolve();
@@ -66,7 +66,7 @@
                             that.jsdo.add(data);
                         });
 
-                        that.jsdo.offlineSaveChanges()
+                        that.jsdo._offlineSaveChanges()
                             .done(function (jsdo, success, request) {
                                 opts.success();
                                 deferred.resolve();
@@ -87,7 +87,7 @@
                             rec.remove();
                         });
 
-                        that.jsdo.offlineSaveChanges()
+                        that.jsdo._offlineSaveChanges()
                             .done(function (jsdo, success, request) {
                                 opts.success();
                                 deferred.resolve();
@@ -133,7 +133,7 @@
 
             else
             if (that.jsdo.hasChanges()) {
-                that.jsdo.offlineSaveChanges()
+                that.jsdo._offlineSaveChanges()
                     .done(function () {
                         deferred.resolve();
                         if (app.isConnected()) {
@@ -149,6 +149,12 @@
             return deferred;
         },
 
+        deleteOfflineData: function() {
+            var that = this;
+
+            that.jsdo._offlineDeleteLocal();
+        },
+
         _createJSDO: function (name) {
             var that = this,
                 jsdo = new progress.data.JSDO({
@@ -156,13 +162,13 @@
                     autoFill: false
                 });
 
-            jsdo.offlineFill = function (opts) {
+            jsdo._offlineFill = function (opts) {
                 var that = this, deferred = $.Deferred();
 
                 if (app.isConnected()) {
                     that.readLocal(that.name);
                     if (that.hasChanges()) {
-                        that.offlineSaveChanges()
+                        that._offlineSaveChanges()
                             .done(doFill)
                             .fail(function () {
                                 deferred.reject(that, false, null)
@@ -187,13 +193,13 @@
                         })
                         .fail(function (jsdo, success, request) {
                             that.displayErrors();
-                            that.offlineDeleteLocal();
+                            that._offlineDeleteLocal();
                             deferred.reject(jsdo, success, request);
                         });
                 }
             };
 
-            jsdo.offlineSaveChanges = function (submit) {
+            jsdo._offlineSaveChanges = function (submit) {
                 var that = this, deferred = $.Deferred();
 
                 that.saveLocal(that.name);
@@ -212,7 +218,7 @@
                             that.displayErrors();
                             app.onSyncFail();
 
-                            that.offlineRejectChanges();
+                            that._offlineRejectChanges();
                             that.saveLocal(that.name);
 
                             deferred.reject(jsdo, success, request);
@@ -225,14 +231,14 @@
                 return deferred.promise();
             };
 
-            jsdo.offlineRejectChanges = function () {
+            jsdo._offlineRejectChanges = function () {
                 var that = this;
 
                 that.rejectChanges();
                 that.saveLocal(that.name);
             };
 
-            jsdo.offlineDeleteLocal = function () {
+            jsdo._offlineDeleteLocal = function () {
                 var that = this;
 
                 that.deleteLocal(that.name);

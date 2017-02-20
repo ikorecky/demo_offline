@@ -196,7 +196,7 @@
             var that = this;
 
             $.each(that.jsdoSession.JSDOs, function (idx, jsdo) {
-                jsdo.offlineDeleteLocal();
+                jsdo.dataSource.deleteOfflineData();
             });
         },
 
@@ -291,7 +291,7 @@
                         ft.abort();
 
                         cnt++;
-                        if (cnt < 3) {
+                        if (cnt < 5) {
                             downloadCatalog();
                         }
                         else {

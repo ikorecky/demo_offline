@@ -38,13 +38,20 @@
     color: #f00;
 }
 
-#connect, #connect-done, #connect-fail, #online-footer, #offline-footer, #sync-footer, #sync-done-footer, #sync-fail-footer {
+#connect-footer,
+#connect-done-footer,
+#connect-fail-footer,
+#online-footer,
+#offline-footer,
+#sync-footer,
+#sync-done-footer,
+#sync-fail-footer {
     display: none;
 }
 
-#app-footer.connect #connect,
-#app-footer.connect-done #connect-done,
-#app-footer.connect-fail #connect-fail,
+#app-footer.connect #connect-footer,
+#app-footer.connect-done #connect-done-footer,
+#app-footer.connect-fail #connect-fail-footer,
 #app-footer.online #online-footer,
 #app-footer.offline #offline-footer,
 #app-footer.sync #sync-footer,

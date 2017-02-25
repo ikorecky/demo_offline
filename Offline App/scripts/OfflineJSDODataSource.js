@@ -1,4 +1,4 @@
-(function () {
+(function ($) {
     OfflineJSDODataSource = kendo.data.DataSource.extend({
         init: function (opts) {
             var that = this;
@@ -257,4 +257,4 @@
             return jsdo;
         }
     });
-})();
+})(jQuery);

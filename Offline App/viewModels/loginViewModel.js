@@ -8,6 +8,10 @@
                 app.onShow();
             });
 
+
+            // $(window).on("online", doRefresh);
+            // $(window).on("offline", doRefresh);
+
             document.addEventListener("online", doRefresh);
             document.addEventListener("offline", doRefresh);
 

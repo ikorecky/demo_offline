@@ -381,6 +381,14 @@
             that._wasOnline = isOnline;
             that._displayFooter();
 
+            // $(window).on("online", function() {
+            //     that._onOnlineOffline();
+            // });
+
+            // $(window).on("offline", function() {
+            //     that._onOnlineOffline();
+            // });
+
             document.addEventListener("online", function () {
                 that._onOnlineOffline();
             });

@@ -4,7 +4,7 @@
     <title></title>
 </head>
 <body>
-    <div id="menu"
+    <div id="DetailsMenu"
         data-role="view"
         data-show="app.viewModels.employeeViewModel.onShowDetail"
         data-hide="app.viewModels.employeeViewModel.onHideDetail"
@@ -14,7 +14,7 @@
         <div data-role="header">
             <div data-role="navbar">
                 <a data-role="button" data-align="left" data-icon="details" data-bind="click: onCancel" class="km-back"></a>
-                <span data-bind="text: currentItem.FullName"></span>
+                <span data-bind="text: currentItem.name"></span>
                 <a data-role="button" data-align="right" data-icon="delete" data-bind="click: onDelete, invisible: isEdit"></a>
                 <a data-role="button" data-align="right" data-icon="compose" data-bind="click: onEdit, invisible: isEdit"></a>
                 <a data-role="button" data-align="right" data-icon="save" data-bind="click: onSave, visible: isEdit"></a>
@@ -22,38 +22,59 @@
         </div>
 
         <div id="employee-details">
-            <div class="item-img">
+             <a data-role="button" data-align="right" data-icon="delete" data-bind="click: onDelete, invisible: isEdit"></a>
+                <a data-role="button" data-align="right" data-icon="compose" data-bind="click: onEdit, invisible: isEdit"></a>
+                <a data-role="button" data-align="right" data-icon="save" data-bind="click: onSave, visible: isEdit"></a>
+            <!--<div class="item-img">
                 <img data-bind="attr: {src: currentItem.ImageURI}" data-offline data-responsive/>
-            </div>
+            </div>-->
             <div class="item">
                 <span class="item-label">First Name</span>
-                <input type="text" id="first-name" data-bind="value: currentItem.FirstName, enabled: isEdit" />
+                <input type="text" id="first-name" data-bind="value: currentItem.firstName, enabled: isEdit" />
             </div>
 
             <div class="item">
                 <span class="item-label">Last Name</span>
-                <input type="text" id="last-name" data-bind="value: currentItem.LastName, enabled: isEdit" />
+                <input type="text" id="last-name" data-bind="value: currentItem.lastName, enabled: isEdit" />
             </div>
 
             <div class="item">
-                <span class="item-label">Address</span>
-                <input type="text" id="address" data-bind="value: currentItem.Address, enabled: isEdit" />
-            </div>
-            
-            <div class="item">
-                <span class="item-label">City</span>
-                <input type="text" id="city" data-bind="value: currentItem.City, enabled: isEdit" />
+                <span class="item-label">Worker Id</span>
+                <input type="text" id="address" data-bind="value: currentItem.WorkerId, enabled: isEdit" />
             </div>
 
+          
             <div class="item">
-                <span class="item-label">State</span>
-                <input type="text" id="city" data-bind="value: currentItem.State, enabled: isEdit" />
+                <span class="item-label">dateSite_start</span>
+                <input type="date" id="site_start" data-bind="value: currentItem.dateSite_start, enabled: isEdit" />
             </div>
-
             <div class="item">
                 <span class="item-label">Phone</span>
-                <input type="text" id="city" data-bind="value: currentItem.HomePhone, enabled: isEdit" />
+                <input type="date" id="birth" data-bind="value: currentItem.DateOfBirth, enabled: isEdit" />
             </div>
+              <div style="padding-top:2px; padding-right:10px;">
+                    <span style="color:black; font-size: small;font-weight:bold; ">תעודה מזהה</span>
+                </div>
+
+            <div dir="ltr" style="margin-top:-1em;border-bottom-color: #7ab1ff; border-bottom-style: solid; border-bottom-width:2.5px;">
+                <a class="capturePhotoButtonClass" id="capturePhoto1" data-role="button" data-icon="camera" style="color:red; margin-top: -0.4em;right: 15%; border: 0px; padding: 0.4em 10em;    background-color: transparent;"></a>
+            </div>
+                         <div data-role="modalview" id="popImgcapturedPhoto1" dir="rtl" data-zoom="true" style="left: 1px;width: 90%; height: 100%; background-color:transparent">
+                        <div data-role="header">
+                            <div data-role="navbar">
+                                <span>תעודה מזהה</span>
+                                <a data-bind="events:{click:closePopUpImg1}" data-role="button" data-align="right">סגור</a>
+                            </div>
+                        </div>
+                        <div data-role="content" dir="rtl" style="background-color: transparent; margin-top: 2%;">
+                            <img id="part1" src="" style="width: 100%;" />
+                        </div>
+                        <div data-role="footer">
+                            <div data-role="navbar" data-bind="visible: isEdit">
+                                <a class="capturePhotoButtonClass" id="capturePhoto1_" style="background-color:white;color:#eb5727">החלף תמונה</a>
+                            </div>
+                        </div>
+                    </div>
         </div>
     </div>
 </body>

@@ -215,28 +215,29 @@
             }
             else {
                 that.onConnect();
-
+                    console.log("onConnect")
                 // download catalog also used to verify connection to the server with a controlled timeout
-                that._downloadCatalog()
-                    .done(function () {
+              //  that._downloadCatalog()
+              //      .done(function () {
                         if (that._isLoggedIn) {
                             that._disconnect().always(doConnect);
                         }
                         else {
                             doConnect();
                         }
-                    })
-                    .fail(function () {
-                        that.onConnectFail();
-                        deferred.reject();
-                    });
+               //     })
+                    // .fail(function () {
+                    //     that.onConnectFail();
+                    //     deferred.reject();
+                    // });
             }
 
             return deferred;
 
             function doConnect() {
-                that.jsdoSession.login(that.username, that.password)
+                that.jsdoSession.login(username, password)
                     .done(function () {
+                        
                         that._isLoggedIn = true;
                         that._addCatalog()
                             .done(function () {
@@ -276,6 +277,7 @@
             var that = this, deferred = $.Deferred(), cnt = 0;
 
             if (that.isVirtual()) {
+                console.log("isVirtual == true")
                 deferred.resolve();
             }
             else {
@@ -361,8 +363,9 @@
         _addCatalog: function () {
             var that = this,
                 deferred = $.Deferred(),
-                fileURL = (!that.isVirtual() ? cordova.file.dataDirectory + "/JSDOCatalog.json" : jsdoSettings.catalogURIs);
-
+               // fileURL = (!that.isVirtual() ? cordova.file.dataDirectory + "/JSDOCatalog.json" : jsdoSettings.catalogURIs);
+               fileURL = jsdoSettings.catalogURIs;
+alert(fileURL)
             that.jsdoSession.addCatalog(fileURL)
                 .done(function () {
                     deferred.resolve()

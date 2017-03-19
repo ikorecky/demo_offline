@@ -43,6 +43,7 @@
     "ID_RESOLUTION_HD720P"
   ],
   "CorePlugins": [
+    "cordova-plugin-camera",
     "cordova-plugin-console",
     "cordova-plugin-device",
     "cordova-plugin-dialogs",
@@ -51,5 +52,6 @@
     "cordova-plugin-network-information",
     "cordova-plugin-splashscreen",
     "cordova-plugin-whitelist"
-  ]
+  ],
+  "CordovaPluginVariables": {}
 }

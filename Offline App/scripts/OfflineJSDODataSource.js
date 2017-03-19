@@ -9,7 +9,7 @@
             var name = opts.name,
                 idField = null,
                 jsdo = that._createJSDO(name);
-
+console.log(progress.data.ServicesManager.getResource(name))
             $.each(progress.data.ServicesManager.getResource(name).schema.properties, function (name, ds) {
                 $.each(ds.properties, function (name, tt) {
                     idField = tt.primaryKey[0];
@@ -40,9 +40,13 @@
 
                     update: function (opts) {
                         var deferred = $.Deferred();
-
+                        
                         $.each(opts.data.models, function (idx, data) {
+                            alert(data._id)
+                            //console.log(that.jsdo.findById(data._id))
+                            
                             var rec = that.jsdo.findById(data._id);
+                            
                             rec.assign(data);
                         });
 
